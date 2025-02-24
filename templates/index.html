@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Chatbot</title>
+    <script>
+        async function sendMessage() {
+            let userMessage = document.getElementById("user-input").value;
+            if (!userMessage) {
+                alert("Please enter a message!");
+                return;
+            }
+
+            let response = await fetch("/chat", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message: userMessage })
+            });
+
+            let result = await response.json();
+            document.getElementById("chat-box").innerHTML += "<p><b>You:</b> " + userMessage + "</p>";
+            document.getElementById("chat-box").innerHTML += "<p><b>Bot:</b> " + result.response + "</p>";
+            document.getElementById("user-input").value = "";
+
+            speakText(result.response);
+        }
+
+        function speakText(text) {
+            let speech = new SpeechSynthesisUtterance(text);
+            speechSynthesis.speak(speech);
+        }
+
+        function startListening() {
+            let recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = "en-US";
+            recognition.start();
+
+            recognition.onresult = function(event) {
+                let spokenText = event.results[0][0].transcript;
+                document.getElementById("user-input").value = spokenText;
+                sendMessage();
+            };
+
+            recognition.onerror = function(event) {
+                alert("Speech recognition error: " + event.error);
+            };
+        }
+    </script>
+</head>
+<body>
+    <h2>Audio Chatbot</h2>
+    <div id="chat-box" style="border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: auto;"></div>
+    <input type="text" id="user-input" placeholder="Type a message..." />
+    <button onclick="sendMessage()">Send</button>
+    <button onclick="startListening()">🎤 Speak</button>
+</body>
+</html>
