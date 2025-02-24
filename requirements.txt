@@ -9,3 +9,5 @@ packaging==24.2
 setuptools==75.8.0
 Werkzeug==3.1.3
 wheel==0.45.1
+scikit-learn  # Added (Required for model.pkl)
+gTTS  # Added (Replaces pyttsx3 for Text-to-Speech)
